@@ -1,0 +1,686 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Revisor de Empleos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f3eee3; --surface:#fbf8f1; --surface-2:#efe8d8; --ink:#23211d; --muted:#6b6458; --line:#ddd3bf;
+  --accent:#2f4a6d; --accent-ink:#ffffff; --accent-soft:#e2e8f0; --gold:#9a742a;
+  --ok:#3c7049; --ok-bg:#e1ede0; --no:#a3443a; --no-bg:#f5e0db; --na:#8a8273; --na-bg:#ece6d9;
+  --shadow:0 1px 2px rgba(40,30,10,.06),0 6px 18px rgba(40,30,10,.06);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#15161a; --surface:#1d1f25; --surface-2:#262930; --ink:#ece6d8; --muted:#a39c8e; --line:#353945;
+    --accent:#93b2db; --accent-ink:#11141a; --accent-soft:#25303f; --gold:#d6b26b;
+    --ok:#86c595; --ok-bg:#1e3226; --no:#e8907f; --no-bg:#3b2325; --na:#8d8678; --na-bg:#2a2c33;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 18px rgba(0,0,0,.25);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#15161a; --surface:#1d1f25; --surface-2:#262930; --ink:#ece6d8; --muted:#a39c8e; --line:#353945;
+  --accent:#93b2db; --accent-ink:#11141a; --accent-soft:#25303f; --gold:#d6b26b;
+  --ok:#86c595; --ok-bg:#1e3226; --no:#e8907f; --no-bg:#3b2325; --na:#8d8678; --na-bg:#2a2c33;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 18px rgba(0,0,0,.25);
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 "Nunito Sans",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+h1,h2,h3{font-family:"Cormorant Garamond",Georgia,serif;font-weight:700;margin:0;letter-spacing:.01em}
+.wrap{max-width:1180px;margin:0 auto;padding:28px 16px 64px}
+header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:18px}
+header.top h1{font-size:40px;line-height:1}
+header.top p{margin:6px 0 0;color:var(--muted);max-width:620px}
+.who{font-size:13px;color:var(--muted)}
+.who b{color:var(--ink)}
+nav.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:22px;overflow-x:auto}
+nav.tabs button{background:none;border:0;padding:10px 16px;cursor:pointer;color:var(--muted);font-weight:700;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap}
+nav.tabs button[aria-selected="true"]{color:var(--ink);border-color:var(--gold)}
+.panel{display:none}.panel.on{display:block}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px;box-shadow:var(--shadow)}
+.card + .card{margin-top:16px}
+.card h2{font-size:24px;margin-bottom:10px}
+.card h3{font-size:19px;margin:0 0 8px}
+.muted{color:var(--muted)}
+.small{font-size:13px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.spacer{flex:1}
+.btn{border:1px solid var(--line);background:var(--surface);padding:7px 13px;border-radius:8px;cursor:pointer;font-weight:600;font-size:14px}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.ghost{background:transparent}
+.btn.danger{color:var(--no)}
+.btn.sm{padding:4px 9px;font-size:13px}
+input[type=text],input[type=number],select,textarea{background:var(--surface);border:1px solid var(--line);border-radius:7px;padding:6px 8px;min-width:0}
+input:focus,select:focus,textarea:focus,button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+textarea{width:100%;min-height:110px;font-family:ui-monospace,Menlo,monospace;font-size:12px}
+input[type=number]{width:62px;text-align:center}
+.grid-attrs{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px}
+.attr{background:var(--surface-2);border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:4px}
+.attr label{font-weight:700;font-size:13px;color:var(--muted)}
+.attr input{width:100%;font-size:20px;font-weight:700}
+.grid-skills{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+.sgroup{border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.sgroup h4{margin:0 0 6px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold)}
+.skill{display:grid;grid-template-columns:1fr 150px;gap:8px;align-items:center;padding:3px 0}
+.skill select{width:100%}
+.skill.art{grid-template-columns:1fr 130px auto}
+.bgrow{display:grid;grid-template-columns:130px 1fr 1fr 70px auto;gap:8px;align-items:center;padding:6px 0;border-bottom:1px dashed var(--line)}
+.bgrow:last-child{border-bottom:0}
+.bghead{font-size:12px;color:var(--muted);font-weight:700;border-bottom:1px solid var(--line)}
+.adv{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.layout>*{min-width:0}
+.layout{display:grid;grid-template-columns:300px minmax(0,1fr);gap:18px;align-items:start}
+.joblist{display:flex;flex-direction:column;gap:8px;position:sticky;top:12px}
+.jobbtn{text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px;cursor:pointer;display:flex;flex-direction:column;gap:4px}
+.jobbtn[aria-current="true"]{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.jobbtn .n{font-weight:700}
+.jobbtn .s{font-size:12.5px;color:var(--muted)}
+.badge{display:inline-block;padding:2px 9px;border-radius:999px;font-size:12px;font-weight:700;background:var(--na-bg);color:var(--na)}
+.badge.r1,.badge.r2,.badge.r3,.badge.r4,.badge.r5{background:var(--ok-bg);color:var(--ok)}
+.badge.r0{background:var(--no-bg);color:var(--no)}
+.ladder{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:14px 0 6px}
+.step{border:1px solid var(--line);border-radius:10px;padding:8px 6px;text-align:center;cursor:pointer;background:var(--surface)}
+.step .t{font-weight:700;font-size:14px}
+.step .p{font-size:12px;color:var(--muted)}
+.step.got{background:var(--ok-bg);border-color:transparent}
+.step.got .t{color:var(--ok)}
+.step.target{outline:2px solid var(--gold);outline-offset:1px}
+.missing{list-style:none;padding:0;margin:8px 0 0}
+.missing li{display:flex;gap:10px;align-items:baseline;padding:7px 0;border-bottom:1px dashed var(--line)}
+.missing li:last-child{border-bottom:0}
+.missing .k{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);min-width:78px}
+.missing .d{margin-left:auto;font-weight:700;color:var(--no);white-space:nowrap}
+.allgood{padding:12px;border-radius:8px;background:var(--ok-bg);color:var(--ok);font-weight:700}
+.tablewrap{overflow-x:auto;margin-top:8px}
+table.req{border-collapse:collapse;width:100%;min-width:640px;font-size:14px}
+table.req th,table.req td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:center}
+table.req th{font-size:12px;color:var(--muted);font-weight:700}
+table.req td.l,table.req th.l{text-align:left}
+table.req td.c{font-variant-numeric:tabular-nums}
+td.ok{background:var(--ok-bg);color:var(--ok)}
+td.no{background:var(--no-bg);color:var(--no)}
+td.tg{box-shadow:inset 0 0 0 2px var(--gold)}
+.kind{display:block;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.alt{font-size:12px;color:var(--muted)}
+.checks label{display:flex;gap:8px;align-items:flex-start;padding:5px 0}
+.seniority{display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin-top:6px}
+.seniority label{display:flex;gap:6px;align-items:center}
+.reqcard{border:1px solid var(--line);border-radius:10px;padding:10px;margin-top:10px;background:var(--surface-2)}
+.opt{display:flex;flex-direction:column;gap:6px}
+.or{font-size:12px;font-weight:700;color:var(--gold);text-align:center;margin:6px 0;letter-spacing:.1em}
+.and{font-size:11px;color:var(--muted);padding-left:6px}
+.cond{display:flex;flex-wrap:wrap;gap:6px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px}
+.cond .th{display:flex;gap:4px;align-items:center;margin-left:auto}
+.cond .th input{width:44px}
+.th-lab{display:flex;gap:4px;margin-left:auto;font-size:10.5px;color:var(--muted)}
+.th-lab span{width:44px;text-align:center}
+.formgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+.formgrid label{display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:700;color:var(--muted)}
+.formgrid input,.formgrid select{width:100%}
+dialog{border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink);max-width:560px;width:calc(100% - 32px);padding:18px}
+dialog::backdrop{background:rgba(0,0,0,.4)}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 14px;border-radius:8px;font-weight:700;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none}
+.toast.on{opacity:1}
+details.help{margin-bottom:16px}
+details.help summary{cursor:pointer;font-weight:700;color:var(--accent)}
+details.help ul{margin:8px 0 0;padding-left:18px;color:var(--muted)}
+.empty{padding:28px;text-align:center;color:var(--muted)}
+@media (max-width:820px){
+  .layout{grid-template-columns:minmax(0,1fr)}
+  .missing li{flex-wrap:wrap;gap:2px 10px}
+  .missing .d{margin-left:0;width:100%}
+  .card{padding:14px}
+  .joblist{position:static}
+  .bgrow{grid-template-columns:1fr 1fr;}
+  .bgrow.bghead{display:none}
+  .ladder{grid-template-columns:repeat(5,minmax(0,1fr));gap:4px}
+  .step .t{font-size:12px}
+  .th-lab{display:none}
+  .cond .th{margin-left:0}
+  header.top h1{font-size:32px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>Revisor de Empleos</h1>
+      <p>Carga tu ficha y mira qué nivel alcanzas en cada empleo y qué te falta para el siguiente.</p>
+    </div>
+    <div class="who" id="who"></div>
+  </header>
+
+  <nav class="tabs" role="tablist">
+    <button role="tab" data-tab="empleos" aria-selected="true">Empleos</button>
+    <button role="tab" data-tab="ficha" aria-selected="false">Mi ficha</button>
+    <button role="tab" data-tab="editor" aria-selected="false">Editor de empleos</button>
+  </nav>
+
+  <!-- EMPLEOS -->
+  <section class="panel on" id="p-empleos">
+    <details class="help">
+      <summary>¿Cómo funciona?</summary>
+      <ul>
+        <li>Primero carga tus atributos, habilidades y trasfondos en <b>Mi ficha</b>. Se guardan en este navegador.</li>
+        <li>Cada requisito tiene 5 umbrales: Novato, Competente, Experto, Maestro y Legendario. Tu nivel en el empleo es el <b>más bajo</b> que alcanzas entre todos los requisitos.</li>
+        <li>Toca un nivel de la escalera para ver exactamente qué te falta para llegar a él.</li>
+        <li>Los requisitos que no son números (TIMOs, ÉXTASIS, idiomas, arcanos) se marcan a mano.</li>
+        <li>Si un empleo no está, créalo en <b>Editor de empleos</b> copiando sus umbrales del foro y compártelo con el código.</li>
+      </ul>
+    </details>
+    <div class="layout">
+      <aside class="joblist" id="joblist"></aside>
+      <div id="jobdetail"></div>
+    </div>
+  </section>
+
+  <!-- FICHA -->
+  <section class="panel" id="p-ficha">
+    <div class="card">
+      <div class="row">
+        <label class="row" style="gap:8px"><b>Personaje</b> <input type="text" id="f-nombre" placeholder="Nombre del personaje" style="width:240px"></label>
+        <span class="spacer"></span>
+        <button class="btn sm" id="f-export">Exportar código</button>
+        <button class="btn sm" id="f-import">Importar código</button>
+        <button class="btn sm ghost" id="f-example">Cargar ejemplo</button>
+        <button class="btn sm ghost danger" id="f-reset">Vaciar</button>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Atributos</h2>
+      <div class="grid-attrs" id="f-attrs"></div>
+    </div>
+    <div class="card">
+      <h2>Habilidades</h2>
+      <p class="muted small" style="margin-top:-4px">Desentrenado (+0) · Novato (+1) · Competente (+2) · Experto (+4) · Maestro (+7) · Legendario (+9)</p>
+      <div class="grid-skills" id="f-skills"></div>
+    </div>
+    <div class="card">
+      <div class="row"><h2>Trasfondos</h2><span class="spacer"></span><button class="btn sm" id="f-addbg">+ Añadir trasfondo</button></div>
+      <p class="muted small" style="margin-top:0">Deja la específica vacía para un trasfondo general. Ej.: Biblioteca · Medicina (general) y Biblioteca · Medicina &gt; Heridas mágicas (específica) van en dos filas.</p>
+      <div id="f-bgs"></div>
+    </div>
+    <div class="card">
+      <h2>Ventajas</h2>
+      <div class="adv" id="f-adv"></div>
+    </div>
+  </section>
+
+  <!-- EDITOR -->
+  <section class="panel" id="p-editor">
+    <div class="card">
+      <div class="row">
+        <select id="e-pick" style="min-width:220px"></select>
+        <button class="btn sm primary" id="e-new">+ Nuevo empleo</button>
+        <button class="btn sm" id="e-dup">Duplicar</button>
+        <span class="spacer"></span>
+        <button class="btn sm" id="e-export">Exportar empleo</button>
+        <button class="btn sm" id="e-import">Importar empleo</button>
+        <button class="btn sm ghost" id="e-restore">Restaurar Sanador</button>
+        <button class="btn sm ghost danger" id="e-del">Eliminar</button>
+      </div>
+    </div>
+    <div id="e-body"></div>
+  </section>
+</div>
+
+<dialog id="dlg">
+  <h3 id="dlg-t" style="font-size:22px;margin-bottom:6px"></h3>
+  <p class="muted small" id="dlg-p" style="margin-top:0"></p>
+  <textarea id="dlg-ta"></textarea>
+  <div class="row" style="margin-top:10px;justify-content:flex-end">
+    <button class="btn" id="dlg-cancel">Cerrar</button>
+    <button class="btn primary" id="dlg-ok"></button>
+  </div>
+</dialog>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============ Datos del sistema ============ */
+const RANKS = ['No cumple','Novato','Competente','Experto','Maestro','Legendario'];
+const RANK_SHORT = ['—','Nov.','Comp.','Exp.','Maes.','Leg.'];
+const SKILL_LV = ['Desentrenado (+0)','Novato (+1)','Competente (+2)','Experto (+4)','Maestro (+7)','Legendario (+9)'];
+const SKILL_NAME = ['Desentrenado','Novato','Competente','Experto','Maestro','Legendario'];
+const ATTRS = ['Vigor','Destreza','Carisma','Voluntad','Percepción','Inteligencia','Poder'];
+const ART = 'Arte/Artesanía';
+const SKILLS = {
+  'Vigor':['Atletismo','Pelea'],
+  'Destreza':['Esquiva','Latrocinio','Sigilo','Vuelo'],
+  'Carisma':['Coordinación','Intimidación','Oratoria','Seducción','Subterfugio'],
+  'Voluntad':[ART,'Estilo','Frialdad'],
+  'Percepción':['Alerta','Consciencia','Empatía','Iniciativa','Investigación'],
+  'Inteligencia':['Adivinación','Arcanismo','Callejeo','Cultura Mágica','Cultura Muggle','Herbología','Magizoología','Medicina','Política','Supervivencia'],
+  'Poder':['Duelo','Pociones','Rituales']
+};
+const ALL_SKILLS = Object.values(SKILLS).flat();
+const BG_TYPES = ['Biblioteca','Influencia','Informantes','Seguidores'];
+const ADVS = ['Fama','Orden de Merlín','Patrón','Recursos'];
+const CAT_CONOC = {
+  'Adivinación':['Métodos adivinatorios','Profecías'],
+  'Arcanismo':['Arcanos','Artes oscuras','No-Seres','Objetos mágicos','Otros planos'],
+  'Callejeo':['Contrabando','Criminales','Localizaciones'],
+  'Cultura Mágica':['Deportes mágicos','Historia de la magia','Hogwarts','Mundo del corazón'],
+  'Cultura Muggle':['Arte muggle','Deportes muggles','Tecnología'],
+  'Herbología':['Pociones','Plantas naturales'],
+  'Magizoología':['Animales muggles','Bestias mágicas','Espíritus','Seres racionales'],
+  'Medicina':['Enfermedades mágicas','Experimental','Heridas mágicas','Medicina muggle'],
+  'Política':['Ley mágica','Ministerio de Magia'],
+  'Supervivencia':['Caza','Entornos hostiles','Orientarse']
+};
+const CAT_SOC = {
+  'Académicos':['Adivinadores y oráculos','Arcanistas','Arqueólogos e historiadores','Biólogos e investigadores médicos','Herbólogos y pocionistas','Magizoólogos','Muggleólogos'],
+  'Bajos fondos':['Contrabandistas','Estafadores','Evanescedores','Falsificadores','Ladrones','Sanadores ilegales','Soplones'],
+  'Hogwarts':['Gryffindor','Hufflepuff','Ravenclaw','Slytherin','Fauna de Hogwarts','Personal no-docente','Profesorado'],
+  'Política':['Azkaban','Bastión Woodcroft','Confederación Internacional de Magos','Gringotts','Hogsmeade','Ministerio de Magia','San Mungo'],
+  'Seres mágicos':['Arpías','Centauros','Duendes','Gente del Agua','Gigantes','Hombres Lobo','Vampiros'],
+  'Sociedad':['Alta sociedad','Deportes','Fantasmas','La Reserva','Muggles','Negocios','Prensa']
+};
+const cats = t => t === 'Biblioteca' ? CAT_CONOC : CAT_SOC;
+const SUELDOS = {
+  'Muy Bajo':[15,25,40,60,100], 'Bajo':[30,50,80,120,200], 'Medio':[45,75,125,175,300],
+  'Alto':[60,100,160,250,400], 'Muy Alto':[75,125,200,300,500]
+};
+
+/* ============ Empleo de base ============ */
+const A = (a,th)=>({k:'attr',a,th});
+const S = (s,th)=>({k:'skill',s,th});
+const B = (t,c,e,th)=>({k:'bg',t,c,e,th});
+const one = c => ({opts:[[c]]});
+function sanador(){
+  return {
+    id:'sanador', nombre:'Sanador/a', sueldo:'', unico:false,
+    notas:'Empleo de ejemplo cargado desde la tabla de requisitos de Sanadora. Revisa el sueldo en el foro.',
+    reqs:[
+      one(A('Inteligencia',[2,3,4,5,6])), one(A('Poder',[1,2,2,3,4])),
+      one(A('Voluntad',[1,1,2,2,3])), one(A('Percepción',[1,1,2,2,3])),
+      one(S('Medicina',[2,3,3,3,4])), one(S('Herbología',[1,2,2,3,4])),
+      one(S('Magizoología',[1,2,2,3,4])), one(S('Arcanismo',[1,1,2,2,3])),
+      one(S('Cultura Mágica',[1,1,2,2,3])), one(S('Oratoria',[0,1,1,2,3])),
+      one(S('Frialdad',[0,1,2,3,3])), one(S('Empatía',[1,1,2,3,4])),
+      one(S('Alerta',[0,1,1,2,3])), one(S('Pociones',[1,2,2,3,4])),
+      one(S('Rituales',[1,2,2,3,4])), one(S('Cultura Muggle',[0,0,0,1,2])),
+      one(B('Biblioteca','Herbología','',[1,1,2,3,3])),
+      one(B('Biblioteca','Herbología','Plantas naturales',[0,1,2,2,2])),
+      one(B('Biblioteca','Herbología','Pociones',[0,1,2,2,2])),
+      one(B('Biblioteca','Medicina','',[1,2,3,3,5])),
+      one(B('Biblioteca','Medicina','Enfermedades mágicas',[0,2,3,3,5])),
+      one(B('Biblioteca','Medicina','Experimental',[0,0,2,3,3])),
+      one(B('Biblioteca','Medicina','Heridas mágicas',[0,2,3,3,5])),
+      one(B('Biblioteca','Medicina','Medicina muggle',[0,0,1,2,2])),
+      one(B('Informantes','Política','San Mungo',[0,1,2,2,3])),
+      one(B('Influencia','Política','San Mungo',[0,0,2,2,3]))
+    ],
+    checks:[
+      {t:'TIMOs: "Supera las expectativas" o más', desde:1},
+      {t:'ÉXTASIS: "Supera las expectativas" o más en 2 de 4 (Herbología / Transformación y Encantamientos / Criaturas / DCAO)', desde:1}
+    ]
+  };
+}
+function emptyFicha(){
+  const skills = {}; ALL_SKILLS.forEach(s=>{ if(s!==ART) skills[s]=0; });
+  const attrs = {}; ATTRS.forEach(a=>attrs[a]=1);
+  const adv = {}; ADVS.forEach(a=>adv[a]=0);
+  return {nombre:'', attrs, skills, artes:[], bgs:[], adv, jobState:{}};
+}
+function exampleFicha(){
+  const f = emptyFicha();
+  f.nombre = 'Hana Park (ejemplo)';
+  Object.assign(f.attrs,{Vigor:2,Destreza:1,Carisma:2,Voluntad:3,'Percepción':2,Inteligencia:4,Poder:4});
+  Object.assign(f.skills,{Atletismo:2,Pelea:0,Esquiva:2,Latrocinio:0,Sigilo:1,Vuelo:0,'Coordinación':2,'Intimidación':1,Oratoria:2,'Seducción':1,Subterfugio:0,Estilo:2,Frialdad:3,Alerta:2,Consciencia:0,'Empatía':2,Iniciativa:2,'Investigación':1,'Adivinación':1,Arcanismo:3,Callejeo:0,'Cultura Mágica':2,'Cultura Muggle':1,'Herbología':3,'Magizoología':2,Medicina:3,'Política':0,Supervivencia:1,Duelo:3,Pociones:3,Rituales:3});
+  f.artes = [{n:'Baile',v:2},{n:'Gayageum',v:2},{n:'Cocina',v:2}];
+  f.bgs = [
+    {t:'Biblioteca',c:'Herbología',e:'',v:3},{t:'Biblioteca',c:'Herbología',e:'Plantas naturales',v:3},
+    {t:'Biblioteca',c:'Herbología',e:'Pociones',v:3},{t:'Biblioteca',c:'Medicina',e:'',v:3},
+    {t:'Biblioteca',c:'Medicina',e:'Enfermedades mágicas',v:3},{t:'Biblioteca',c:'Medicina',e:'Experimental',v:2},
+    {t:'Biblioteca',c:'Medicina',e:'Heridas mágicas',v:3},{t:'Biblioteca',c:'Medicina',e:'Medicina muggle',v:1},
+    {t:'Biblioteca',c:'Cultura Mágica',e:'Hogwarts',v:3},
+    {t:'Informantes',c:'Política',e:'',v:1},{t:'Informantes',c:'Política',e:'San Mungo',v:3},
+    {t:'Informantes',c:'Sociedad',e:'Deportes',v:1},
+    {t:'Influencia',c:'Política',e:'',v:2},{t:'Influencia',c:'Política',e:'San Mungo',v:3}
+  ];
+  return f;
+}
+
+/* ============ Persistencia ============ */
+const K_F='revisorEmpleos.ficha', K_J='revisorEmpleos.jobs', K_UI='revisorEmpleos.ui';
+function load(k,fb){ try{ const v=localStorage.getItem(k); return v?JSON.parse(v):fb; }catch(e){ return fb; } }
+function save(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} }
+let ficha = load(K_F,null) || emptyFicha();
+let jobs = load(K_J,null) || [sanador()];
+let ui = Object.assign({tab:'empleos', job:null, target:{}, edit:null}, load(K_UI,{}));
+// normalizar ficha cargada
+(function(){ const base=emptyFicha(); for(const k of ['attrs','skills','adv']) ficha[k]=Object.assign(base[k],ficha[k]||{}); ficha.artes=ficha.artes||[]; ficha.bgs=ficha.bgs||[]; ficha.jobState=ficha.jobState||{}; })();
+let saveT; function persist(){ clearTimeout(saveT); saveT=setTimeout(()=>{ save(K_F,ficha); save(K_J,jobs); save(K_UI,ui); },150); }
+
+/* ============ Utilidades ============ */
+const $ = s => document.querySelector(s);
+const esc = s => String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const norm = s => String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').trim().toLowerCase();
+const num = v => { const n=parseFloat(v); return isNaN(n)?0:n; };
+const encode = o => btoa(unescape(encodeURIComponent(JSON.stringify(o))));
+const decode = s => JSON.parse(decodeURIComponent(escape(atob(s.trim()))));
+function toast(m){ const t=$('#toast'); t.textContent=m; t.classList.add('on'); setTimeout(()=>t.classList.remove('on'),1600); }
+async function copy(txt){ try{ await navigator.clipboard.writeText(txt); toast('Copiado'); }catch(e){ openDlg('Copia este texto','',txt,null); } }
+
+/* ============ Motor de cálculo ============ */
+function valueOf(c){
+  if(c.k==='attr') return num(ficha.attrs[c.a]);
+  if(c.k==='adv') return num(ficha.adv[c.v]);
+  if(c.k==='skill'){
+    if(c.s===ART){
+      const list = c.sp ? ficha.artes.filter(x=>norm(x.n)===norm(c.sp)) : ficha.artes;
+      return list.reduce((m,x)=>Math.max(m,num(x.v)),0);
+    }
+    return num(ficha.skills[c.s]);
+  }
+  if(c.k==='bestskill'){
+    let m=0; (SKILLS[c.a]||[]).forEach(s=>{ m=Math.max(m, s===ART ? ficha.artes.reduce((a,x)=>Math.max(a,num(x.v)),0) : num(ficha.skills[s])); });
+    return m;
+  }
+  if(c.k==='bg'){
+    let m=0;
+    ficha.bgs.forEach(b=>{
+      if(norm(b.t)!==norm(c.t)) return;
+      if(c.c!=='*' && norm(b.c)!==norm(c.c)) return;
+      const e=c.e||'';
+      if(e===''){ if(norm(b.e)!=='') return; }
+      else if(e==='*'){ if(norm(b.e)==='') return; }
+      else if(norm(b.e)!==norm(e)) return;
+      m=Math.max(m,num(b.v));
+    });
+    return m;
+  }
+  return 0;
+}
+const need = (c,r) => { let m=0; for(let i=0;i<r;i++) m=Math.max(m,num(c.th[i])); return m; };
+function condReach(c){ const v=valueOf(c); let r=0; for(let i=1;i<=5;i++){ if(v>=need(c,i)) r=i; else break; } return r; }
+function optReach(o){ return o.length ? Math.min(...o.map(condReach)) : 5; }
+function reqReach(q){ return q.opts.length ? Math.max(...q.opts.map(optReach)) : 5; }
+function jstate(j){ return ficha.jobState[j.id] || (ficha.jobState[j.id]={roles:0,years:0,checks:{}}); }
+function evaluate(j){
+  const st=jstate(j);
+  const rows=j.reqs.map(q=>({q,r:reqReach(q)}));
+  let lvl = j.reqs.length ? Math.min(5,...rows.map(x=>x.r)) : 0;
+  const numLvl=lvl;
+  (j.checks||[]).forEach((c,i)=>{ if(!st.checks[i] && lvl>=c.desde){ lvl=Math.max(0,c.desde-1); } });
+  const okM = num(st.roles)>=8 || num(st.years)>=1, okL = num(st.roles)>=24 || num(st.years)>=3;
+  if(lvl>=4 && !okM) lvl=3;
+  if(lvl>=5 && !okL) lvl=4;
+  return {lvl,numLvl,rows,okM,okL,st};
+}
+function missingFor(j,ev,r){
+  const out=[];
+  ev.rows.forEach(({q,r:qr})=>{
+    if(qr>=r) return;
+    // escoger la alternativa con menor déficit total
+    let best=null;
+    q.opts.forEach(o=>{
+      const items=o.map(c=>({c,v:valueOf(c),n:need(c,r)})).filter(x=>x.v<x.n);
+      const tot=items.reduce((s,x)=>s+(x.n-x.v),0);
+      if(!best||tot<best.tot) best={items,tot};
+    });
+    best && best.items.forEach(x=>out.push({kind:kindName(x.c),label:condLabel(x.c),have:x.v,need:x.n,c:x.c,alt:q.opts.length>1}));
+  });
+  (j.checks||[]).forEach((c,i)=>{ if(!ev.st.checks[i] && c.desde<=r) out.push({kind:'Manual',label:c.t,manual:true}); });
+  if(r>=4 && !ev.okM) out.push({kind:'Antigüedad',label:'1 año ininterrumpido en el puesto u 8 roles de empleo cobrados',manual:true});
+  if(r>=5 && !ev.okL) out.push({kind:'Antigüedad',label:'3 años ininterrumpidos en el puesto o 24 roles de empleo cobrados',manual:true});
+  return out;
+}
+function kindName(c){ return {attr:'Atributo',skill:'Habilidad',bestskill:'Habilidad',bg:'Trasfondo',adv:'Ventaja'}[c.k]||''; }
+function condLabel(c){
+  if(c.k==='attr') return c.a;
+  if(c.k==='adv') return c.v;
+  if(c.k==='skill') return c.s===ART ? (c.sp?`Arte/Artesanía (${c.sp})`:'Arte/Artesanía (cualquiera)') : c.s;
+  if(c.k==='bestskill') return `Mejor habilidad de ${c.a}`;
+  if(c.k==='bg'){ const cat=c.c==='*'?'cualquier categoría':c.c; const e=c.e==='*'?'cualquier específica':c.e; return `${c.t} · ${cat}${e?' > '+e:''}`; }
+  return '';
+}
+const isSkill = c => c.k==='skill'||c.k==='bestskill';
+const fmtVal = (c,v) => isSkill(c) ? `${SKILL_NAME[v]||v}` : String(v);
+const reqLabel = q => q.opts.map(o=>o.map(condLabel).join(' + ')).join('  ó  ');
+
+/* ============ Tabs ============ */
+document.querySelectorAll('nav.tabs button').forEach(b=>b.onclick=()=>setTab(b.dataset.tab));
+function setTab(t){
+  ui.tab=t; persist();
+  document.querySelectorAll('nav.tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===t));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('on',p.id==='p-'+t));
+  if(t==='empleos') renderEmpleos();
+  if(t==='editor') renderEditor();
+}
+function renderWho(){ $('#who').innerHTML = ficha.nombre ? `Ficha cargada: <b>${esc(ficha.nombre)}</b>` : 'Sin ficha cargada'; }
+
+/* ============ Panel: Empleos ============ */
+function renderEmpleos(){
+  renderWho();
+  if(!jobs.length){ $('#joblist').innerHTML=''; $('#jobdetail').innerHTML='<div class="card empty">No hay empleos. Crea uno en el Editor de empleos.</div>'; return; }
+  if(!jobs.find(j=>j.id===ui.job)) ui.job=jobs[0].id;
+  $('#joblist').innerHTML = jobs.map(j=>{
+    const ev=evaluate(j); const nx=Math.min(5,ev.lvl+1);
+    const miss = ev.lvl<5 ? missingFor(j,ev,nx).length : 0;
+    return `<button class="jobbtn" data-id="${esc(j.id)}" aria-current="${j.id===ui.job}">
+      <span class="row"><span class="n">${esc(j.nombre||'Sin nombre')}</span><span class="spacer"></span><span class="badge r${ev.lvl}">${RANKS[ev.lvl]}</span></span>
+      <span class="s">${ev.lvl>=5?'Nivel máximo alcanzado':`Para ${RANKS[nx]}: falta${miss===1?'':'n'} ${miss} requisito${miss===1?'':'s'}`}</span>
+    </button>`;
+  }).join('');
+  document.querySelectorAll('.jobbtn').forEach(b=>b.onclick=()=>{ ui.job=b.dataset.id; persist(); renderEmpleos(); });
+  renderJob(jobs.find(j=>j.id===ui.job));
+}
+function renderJob(j){
+  const ev=evaluate(j);
+  let tg = ui.target[j.id]; if(!tg || tg<=0) tg=Math.min(5,ev.lvl+1); if(ev.lvl>=5) tg=5;
+  const miss = missingFor(j,ev,tg);
+  const pay = SUELDOS[j.sueldo];
+  const st=ev.st;
+  let h = `<div class="card">
+    <div class="row"><h2 style="margin:0">${esc(j.nombre||'Sin nombre')}</h2><span class="badge r${ev.lvl}">${RANKS[ev.lvl]}</span><span class="spacer"></span>
+      <button class="btn sm" id="j-copy">Copiar resumen</button></div>
+    ${ev.numLvl>ev.lvl?`<div class="small" style="margin-top:6px">Por tus números llegas a <b>${RANKS[ev.numLvl]}</b>; te frenan los requisitos de abajo que se marcan a mano o la antigüedad.</div>`:''}
+    <div class="muted small" style="margin-top:4px">${j.sueldo?`Sueldo ${esc(j.sueldo)}`:'Sueldo sin definir'}${j.unico?' · Puesto único':''}${j.notas?' · '+esc(j.notas):''}</div>
+    <div class="ladder">${[1,2,3,4,5].map(r=>`<div class="step ${r<=ev.lvl?'got':''} ${r===tg?'target':''}" data-r="${r}" role="button" tabindex="0">
+      <div class="t">${RANKS[r]}</div><div class="p">${pay?pay[r-1]+' grageas':'&nbsp;'}</div></div>`).join('')}</div>
+    <h3 style="margin-top:14px">${ev.lvl>=tg?`Ya cumples ${RANKS[tg]}`:`Para ${RANKS[tg]} te falta${miss.length===1?'':'n'} ${miss.length} requisito${miss.length===1?'':'s'}`}</h3>
+    ${ev.lvl>=tg ? `<div class="allgood">Tienes todo lo necesario para ${RANKS[tg]}${tg<5?'. Toca un nivel más alto para ver qué sigue.':'.'}</div>` :
+      `<ul class="missing">${miss.map(m=>`<li><span class="k">${esc(m.kind)}</span><span>${esc(m.label)}${m.alt?' <span class="alt">(la opción más cercana)</span>':''}</span>
+        <span class="d">${m.manual?'Marcar a mano':`${esc(fmtVal(m.c,m.have))} → ${esc(fmtVal(m.c,m.need))} (+${m.need-m.have})`}</span></li>`).join('')}</ul>`}
+  </div>`;
+  // checks + antigüedad
+  h += `<div class="card"><h3>Requisitos que se marcan a mano</h3><div class="checks">
+    ${(j.checks||[]).map((c,i)=>`<label><input type="checkbox" data-ck="${i}" ${st.checks[i]?'checked':''}><span>${esc(c.t)} <span class="muted small">(desde ${RANKS[c.desde]})</span></span></label>`).join('') || '<p class="muted small" style="margin:0">Este empleo no tiene requisitos manuales.</p>'}
+    </div>
+    <div class="seniority"><b class="small">Antigüedad (Maestro y Legendario)</b>
+      <label class="small">Roles de empleo cobrados <input type="number" min="0" id="j-roles" value="${num(st.roles)}"></label>
+      <label class="small">Años ininterrumpidos <input type="number" min="0" id="j-years" value="${num(st.years)}"></label>
+    </div></div>`;
+  // tabla
+  h += `<div class="card"><h3>Todos los requisitos</h3><div class="tablewrap"><table class="req">
+    <thead><tr><th class="l">Requisito</th><th>Tienes</th>${[1,2,3,4,5].map(r=>`<th>${RANK_SHORT[r]}</th>`).join('')}<th>Alcanzas</th></tr></thead><tbody>
+    ${ev.rows.map(({q,r})=>{
+      // usar la mejor opción para mostrar
+      let bo=q.opts[0], br=-1; q.opts.forEach(o=>{ const x=optReach(o); if(x>br){br=x;bo=o;} });
+      return bo.map((c,ci)=>{ const v=valueOf(c); const cr=condReach(c);
+        return `<tr>
+        <td class="l"><span class="kind">${kindName(c)}</span>${esc(condLabel(c))}${ci===0&&q.opts.length>1?`<div class="alt">Alternativas: ${esc(reqLabel(q))}</div>`:''}</td>
+        <td class="c"><b>${esc(fmtVal(c,v))}</b></td>
+        ${[1,2,3,4,5].map(i=>`<td class="c ${v>=need(c,i)?'ok':'no'} ${i===tg?'tg':''}">${num(c.th[i-1])}</td>`).join('')}
+        <td><span class="badge r${cr}">${RANKS[cr]}</span></td></tr>`; }).join('');
+    }).join('') || `<tr><td colspan="8" class="empty">Este empleo no tiene requisitos cargados.</td></tr>`}
+    </tbody></table></div></div>`;
+  $('#jobdetail').innerHTML=h;
+  document.querySelectorAll('.step').forEach(s=>{ const go=()=>{ ui.target[j.id]=+s.dataset.r; persist(); renderJob(j); }; s.onclick=go; s.onkeydown=e=>{ if(e.key==='Enter'||e.key===' '){e.preventDefault();go();} }; });
+  document.querySelectorAll('[data-ck]').forEach(c=>c.onchange=()=>{ st.checks[c.dataset.ck]=c.checked; persist(); renderEmpleos(); });
+  $('#j-roles').onchange=e=>{ st.roles=num(e.target.value); persist(); renderEmpleos(); };
+  $('#j-years').onchange=e=>{ st.years=num(e.target.value); persist(); renderEmpleos(); };
+  $('#j-copy').onclick=()=>{
+    let t=`[b]${j.nombre}[/b] — nivel alcanzado: [b]${RANKS[ev.lvl]}[/b]${ficha.nombre?` (${ficha.nombre})`:''}\n`;
+    if(ev.lvl>=tg) t+=`Cumplo todos los requisitos de ${RANKS[tg]}.`;
+    else { t+=`Para [b]${RANKS[tg]}[/b] me falta:\n`; t+=miss.map(m=>`• ${m.label}${m.manual?'':`: ${fmtVal(m.c,m.have)} → ${fmtVal(m.c,m.need)} (+${m.need-m.have})`}`).join('\n'); }
+    copy(t);
+  };
+}
+
+/* ============ Panel: Ficha ============ */
+function opts(list,sel){ return list.map(x=>`<option ${x===sel?'selected':''}>${esc(x)}</option>`).join(''); }
+function lvOpts(sel,max=5){ return SKILL_LV.slice(0,max+1).map((x,i)=>`<option value="${i}" ${+sel===i?'selected':''}>${x}</option>`).join(''); }
+function renderFicha(){
+  renderWho();
+  $('#f-nombre').value=ficha.nombre||'';
+  $('#f-attrs').innerHTML=ATTRS.map(a=>`<div class="attr"><label for="at-${a}">${a}</label><input type="number" min="0" max="9" id="at-${a}" data-at="${a}" value="${num(ficha.attrs[a])}"></div>`).join('');
+  $('#f-skills').innerHTML=ATTRS.map(a=>`<div class="sgroup"><h4>${a}</h4>${SKILLS[a].map(s=>{
+    if(s===ART) return ficha.artes.map((x,i)=>`<div class="skill art"><input type="text" data-artn="${i}" value="${esc(x.n)}" placeholder="Arte/Artesanía (cuál)"><select data-artv="${i}">${lvOpts(x.v)}</select><button class="btn sm ghost danger" data-artx="${i}" aria-label="Quitar">×</button></div>`).join('')
+      + `<div class="skill"><span class="muted small">Arte / Artesanía</span><button class="btn sm" id="f-addart">+ Añadir</button></div>`;
+    return `<div class="skill"><label for="sk-${s}">${s}</label><select id="sk-${s}" data-sk="${s}">${lvOpts(ficha.skills[s])}</select></div>`;
+  }).join('')}</div>`).join('');
+  renderBgs();
+  $('#f-adv').innerHTML=ADVS.map(a=>`<div class="attr"><label for="ad-${a}">${a}</label><input type="number" min="0" max="4" id="ad-${a}" data-ad="${a}" value="${num(ficha.adv[a])}"></div>`).join('');
+  document.querySelectorAll('[data-at]').forEach(i=>i.oninput=()=>{ ficha.attrs[i.dataset.at]=num(i.value); persist(); });
+  document.querySelectorAll('[data-ad]').forEach(i=>i.oninput=()=>{ ficha.adv[i.dataset.ad]=num(i.value); persist(); });
+  document.querySelectorAll('[data-sk]').forEach(i=>i.onchange=()=>{ ficha.skills[i.dataset.sk]=+i.value; persist(); });
+  document.querySelectorAll('[data-artn]').forEach(i=>i.oninput=()=>{ ficha.artes[+i.dataset.artn].n=i.value; persist(); });
+  document.querySelectorAll('[data-artv]').forEach(i=>i.onchange=()=>{ ficha.artes[+i.dataset.artv].v=+i.value; persist(); });
+  document.querySelectorAll('[data-artx]').forEach(i=>i.onclick=()=>{ ficha.artes.splice(+i.dataset.artx,1); persist(); renderFicha(); });
+  $('#f-addart').onclick=()=>{ ficha.artes.push({n:'',v:1}); persist(); renderFicha(); };
+}
+function renderBgs(){
+  const box=$('#f-bgs');
+  if(!ficha.bgs.length){ box.innerHTML='<p class="muted small">Todavía no cargaste trasfondos.</p>'; return; }
+  box.innerHTML=`<div class="bgrow bghead"><span>Tipo</span><span>Categoría general</span><span>Específica (opcional)</span><span>Nivel</span><span></span></div>`+
+  ficha.bgs.map((b,i)=>{ const C=cats(b.t); const catList=Object.keys(C); if(b.c && !catList.includes(b.c)) catList.push(b.c);
+    return `<div class="bgrow">
+      <select data-bt="${i}" aria-label="Tipo">${opts(BG_TYPES,b.t)}</select>
+      <select data-bc="${i}" aria-label="Categoría">${opts(catList,b.c)}</select>
+      <input type="text" list="dl-${i}" data-be="${i}" value="${esc(b.e)}" placeholder="— general —" aria-label="Específica">
+      <datalist id="dl-${i}">${(C[b.c]||[]).map(x=>`<option value="${esc(x)}">`).join('')}</datalist>
+      <input type="number" min="0" max="6" data-bv="${i}" value="${num(b.v)}" aria-label="Nivel">
+      <button class="btn sm ghost danger" data-bx="${i}" aria-label="Quitar">×</button></div>`; }).join('');
+  box.querySelectorAll('[data-bt]').forEach(s=>s.onchange=()=>{ const b=ficha.bgs[+s.dataset.bt]; b.t=s.value; const C=cats(b.t); if(!C[b.c]){ b.c=Object.keys(C)[0]; b.e=''; } persist(); renderBgs(); });
+  box.querySelectorAll('[data-bc]').forEach(s=>s.onchange=()=>{ const b=ficha.bgs[+s.dataset.bc]; b.c=s.value; b.e=''; persist(); renderBgs(); });
+  box.querySelectorAll('[data-be]').forEach(s=>s.oninput=()=>{ ficha.bgs[+s.dataset.be].e=s.value.trim(); persist(); });
+  box.querySelectorAll('[data-bv]').forEach(s=>s.oninput=()=>{ ficha.bgs[+s.dataset.bv].v=num(s.value); persist(); });
+  box.querySelectorAll('[data-bx]').forEach(s=>s.onclick=()=>{ ficha.bgs.splice(+s.dataset.bx,1); persist(); renderBgs(); });
+}
+$('#f-nombre').oninput=e=>{ ficha.nombre=e.target.value; persist(); renderWho(); };
+$('#f-addbg').onclick=()=>{ ficha.bgs.push({t:'Biblioteca',c:'Medicina',e:'',v:1}); persist(); renderBgs(); };
+$('#f-example').onclick=()=>{ if(!confirmReplace()) return; ficha=exampleFicha(); persist(); renderFicha(); toast('Ficha de ejemplo cargada'); };
+$('#f-reset').onclick=()=>{ if(!confirmReplace()) return; ficha=emptyFicha(); persist(); renderFicha(); };
+function confirmReplace(){ const has = ficha.nombre || ficha.bgs.length; return !has || window.confirm('Esto reemplaza la ficha que tienes cargada. ¿Seguir?'); }
+$('#f-export').onclick=()=>openDlg('Código de tu ficha','Guárdalo o pásalo: con "Importar código" se recupera la ficha en cualquier navegador.',encode(ficha),null);
+$('#f-import').onclick=()=>openDlg('Importar ficha','Pega el código de una ficha exportada.','',txt=>{
+  const f=decode(txt); const base=emptyFicha(); for(const k of ['attrs','skills','adv']) f[k]=Object.assign(base[k],f[k]||{});
+  f.artes=f.artes||[]; f.bgs=f.bgs||[]; f.jobState=f.jobState||{}; ficha=f; persist(); renderFicha(); toast('Ficha importada');
+},'Importar');
+
+/* ============ Panel: Editor ============ */
+function curEdit(){ let j=jobs.find(x=>x.id===ui.edit); if(!j){ j=jobs[0]; ui.edit=j?j.id:null; } return j; }
+function newCond(k='attr'){
+  const th=[0,0,0,0,0];
+  if(k==='attr') return {k,a:'Inteligencia',th};
+  if(k==='skill') return {k,s:'Medicina',sp:'',th};
+  if(k==='bestskill') return {k,a:'Inteligencia',th};
+  if(k==='bg') return {k,t:'Biblioteca',c:'Medicina',e:'',th};
+  if(k==='adv') return {k,v:'Fama',th};
+}
+function condEditor(c,qi,oi,ci){
+  const id=`${qi}-${oi}-${ci}`;
+  let f=`<select data-ck-kind="${id}" aria-label="Tipo de requisito">${[['attr','Atributo'],['skill','Habilidad'],['bestskill','Mejor habilidad de…'],['bg','Trasfondo'],['adv','Ventaja']].map(([v,l])=>`<option value="${v}" ${c.k===v?'selected':''}>${l}</option>`).join('')}</select>`;
+  if(c.k==='attr'||c.k==='bestskill') f+=`<select data-cf="a" data-id="${id}">${opts(ATTRS,c.a)}</select>`;
+  if(c.k==='skill'){ f+=`<select data-cf="s" data-id="${id}" data-rr="1">${opts(ALL_SKILLS,c.s)}</select>`; if(c.s===ART) f+=`<input type="text" data-cf="sp" data-id="${id}" value="${esc(c.sp||'')}" placeholder="cuál (vacío = cualquiera)" style="width:170px">`; }
+  if(c.k==='adv') f+=`<select data-cf="v" data-id="${id}">${opts(ADVS,c.v)}</select>`;
+  if(c.k==='bg'){
+    const C=cats(c.t);
+    f+=`<select data-cf="t" data-id="${id}" data-rr="1">${opts(BG_TYPES,c.t)}</select>`;
+    f+=`<select data-cf="c" data-id="${id}" data-rr="1"><option value="*" ${c.c==='*'?'selected':''}>(cualquier categoría)</option>${opts(Object.keys(C),c.c)}</select>`;
+    f+=`<input type="text" list="edl-${id}" data-cf="e" data-id="${id}" value="${esc(c.e||'')}" placeholder="específica (vacío = general, * = cualquiera)" style="width:230px"><datalist id="edl-${id}"><option value="*">${(C[c.c]||[]).map(x=>`<option value="${esc(x)}">`).join('')}</datalist>`;
+  }
+  f+=`<span class="th">${[0,1,2,3,4].map(i=>`<input type="number" min="0" max="9" data-th="${i}" data-id="${id}" value="${num(c.th[i])}" aria-label="${RANKS[i+1]}" title="${RANKS[i+1]}">`).join('')}
+     <button class="btn sm ghost danger" data-cx="${id}" aria-label="Quitar condición">×</button></span>`;
+  return `<div class="cond">${f}</div>`;
+}
+function renderEditor(){
+  const sel=$('#e-pick'); const j=curEdit();
+  sel.innerHTML=jobs.map(x=>`<option value="${esc(x.id)}" ${j&&x.id===j.id?'selected':''}>${esc(x.nombre||'Sin nombre')}</option>`).join('');
+  const body=$('#e-body');
+  if(!j){ body.innerHTML='<div class="card empty">No hay empleos. Crea uno nuevo.</div>'; return; }
+  body.innerHTML=`<div class="card"><h2>Datos del empleo</h2><div class="formgrid">
+      <label>Nombre<input type="text" id="e-nombre" value="${esc(j.nombre)}"></label>
+      <label>Categoría de sueldo<select id="e-sueldo"><option value="">Sin definir</option>${opts(Object.keys(SUELDOS),j.sueldo)}</select></label>
+      <label>Notas<input type="text" id="e-notas" value="${esc(j.notas||'')}"></label>
+      <label style="flex-direction:row;align-items:center;gap:8px;margin-top:22px"><input type="checkbox" id="e-unico" ${j.unico?'checked':''}> Puesto único</label>
+    </div></div>
+    <div class="card"><div class="row"><h2 style="margin:0">Requisitos numéricos</h2><span class="spacer"></span><button class="btn sm primary" id="e-addreq">+ Requisito</button></div>
+      <p class="muted small">Cada requisito lleva los 5 umbrales (Novato, Competente, Experto, Maestro, Legendario). Usa <b>+ y</b> cuando una opción exige dos cosas juntas, y <b>+ ó</b> cuando hay alternativas (p. ej. Vigor + Pelea ó Poder + Duelo).</p>
+      <div class="th-lab"><span>Nov.</span><span>Comp.</span><span>Exp.</span><span>Maes.</span><span>Leg.</span><span style="width:30px"></span></div>
+      ${j.reqs.map((q,qi)=>`<div class="reqcard">
+        ${q.opts.map((o,oi)=>`${oi?'<div class="or">— Ó —</div>':''}<div class="opt">${o.map((c,ci)=>`${ci?'<span class="and">y además</span>':''}${condEditor(c,qi,oi,ci)}`).join('')}
+          <div class="row"><button class="btn sm ghost" data-andadd="${qi}-${oi}">+ y</button></div></div>`).join('')}
+        <div class="row" style="margin-top:8px"><button class="btn sm" data-oradd="${qi}">+ ó (alternativa)</button><span class="spacer"></span>
+          <button class="btn sm ghost" data-up="${qi}" ${qi===0?'disabled':''} aria-label="Subir">↑</button>
+          <button class="btn sm ghost" data-down="${qi}" ${qi===j.reqs.length-1?'disabled':''} aria-label="Bajar">↓</button>
+          <button class="btn sm ghost danger" data-qx="${qi}">Eliminar requisito</button></div>
+      </div>`).join('') || '<p class="muted">Sin requisitos todavía.</p>'}
+    </div>
+    <div class="card"><div class="row"><h2 style="margin:0">Requisitos manuales</h2><span class="spacer"></span><button class="btn sm" id="e-addck">+ Requisito manual</button></div>
+      <p class="muted small">TIMOs, ÉXTASIS, idiomas, arcanos, roles de reclutamiento… El usuario los marca con una casilla. "Desde" es el nivel a partir del cual se exige.</p>
+      ${(j.checks||[]).map((c,i)=>`<div class="cond"><input type="text" data-ckt="${i}" value="${esc(c.t)}" style="flex:1;min-width:200px"><label class="small">Desde <select data-ckd="${i}">${[1,2,3,4,5].map(r=>`<option value="${r}" ${c.desde===r?'selected':''}>${RANKS[r]}</option>`).join('')}</select></label><button class="btn sm ghost danger" data-ckx="${i}" aria-label="Quitar">×</button></div>`).join('<div style="height:6px"></div>')}
+    </div>`;
+  const P=s=>{ const [a,b,c]=s.split('-').map(Number); return j.reqs[a].opts[b][c]; };
+  const rerender=()=>{ persist(); renderEditor(); };
+  $('#e-nombre').oninput=e=>{ j.nombre=e.target.value; persist(); sel.options[sel.selectedIndex].text=j.nombre||'Sin nombre'; };
+  $('#e-sueldo').onchange=e=>{ j.sueldo=e.target.value; persist(); };
+  $('#e-notas').oninput=e=>{ j.notas=e.target.value; persist(); };
+  $('#e-unico').onchange=e=>{ j.unico=e.target.checked; persist(); };
+  $('#e-addreq').onclick=()=>{ j.reqs.push({opts:[[newCond('attr')]]}); rerender(); };
+  $('#e-addck').onclick=()=>{ (j.checks=j.checks||[]).push({t:'',desde:1}); rerender(); };
+  body.querySelectorAll('[data-ck-kind]').forEach(s=>s.onchange=()=>{ const [a,b,c]=s.dataset.ckKind.split('-').map(Number); const old=j.reqs[a].opts[b][c]; const n=newCond(s.value); n.th=old.th; j.reqs[a].opts[b][c]=n; rerender(); });
+  body.querySelectorAll('[data-cf]').forEach(s=>{ const ev=s.tagName==='SELECT'?'onchange':'oninput'; s[ev]=()=>{ const c=P(s.dataset.id); c[s.dataset.cf]=s.value.trim?s.value.trim():s.value; if(s.dataset.cf==='t'){ if(c.c!=='*'&&!cats(c.t)[c.c]){ c.c=Object.keys(cats(c.t))[0]; } c.e=''; } if(s.dataset.cf==='c') c.e=''; persist(); if(s.dataset.rr) renderEditor(); }; });
+  body.querySelectorAll('[data-th]').forEach(s=>s.oninput=()=>{ P(s.dataset.id).th[+s.dataset.th]=num(s.value); persist(); });
+  body.querySelectorAll('[data-cx]').forEach(s=>s.onclick=()=>{ const [a,b,c]=s.dataset.cx.split('-').map(Number); const q=j.reqs[a]; q.opts[b].splice(c,1); if(!q.opts[b].length) q.opts.splice(b,1); if(!q.opts.length) j.reqs.splice(a,1); rerender(); });
+  body.querySelectorAll('[data-andadd]').forEach(s=>s.onclick=()=>{ const [a,b]=s.dataset.andadd.split('-').map(Number); j.reqs[a].opts[b].push(newCond('skill')); rerender(); });
+  body.querySelectorAll('[data-oradd]').forEach(s=>s.onclick=()=>{ j.reqs[+s.dataset.oradd].opts.push([newCond('attr')]); rerender(); });
+  body.querySelectorAll('[data-qx]').forEach(s=>s.onclick=()=>{ j.reqs.splice(+s.dataset.qx,1); rerender(); });
+  body.querySelectorAll('[data-up]').forEach(s=>s.onclick=()=>{ const i=+s.dataset.up; [j.reqs[i-1],j.reqs[i]]=[j.reqs[i],j.reqs[i-1]]; rerender(); });
+  body.querySelectorAll('[data-down]').forEach(s=>s.onclick=()=>{ const i=+s.dataset.down; [j.reqs[i+1],j.reqs[i]]=[j.reqs[i],j.reqs[i+1]]; rerender(); });
+  body.querySelectorAll('[data-ckt]').forEach(s=>s.oninput=()=>{ j.checks[+s.dataset.ckt].t=s.value; persist(); });
+  body.querySelectorAll('[data-ckd]').forEach(s=>s.onchange=()=>{ j.checks[+s.dataset.ckd].desde=+s.value; persist(); });
+  body.querySelectorAll('[data-ckx]').forEach(s=>s.onclick=()=>{ j.checks.splice(+s.dataset.ckx,1); rerender(); });
+}
+const newId=()=>'j'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+$('#e-pick').onchange=e=>{ ui.edit=e.target.value; persist(); renderEditor(); };
+$('#e-new').onclick=()=>{ const j={id:newId(),nombre:'Nuevo empleo',sueldo:'',unico:false,notas:'',reqs:[],checks:[]}; jobs.push(j); ui.edit=j.id; persist(); renderEditor(); };
+$('#e-dup').onclick=()=>{ const j=curEdit(); if(!j) return; const c=JSON.parse(JSON.stringify(j)); c.id=newId(); c.nombre=j.nombre+' (copia)'; jobs.push(c); ui.edit=c.id; persist(); renderEditor(); };
+$('#e-del').onclick=()=>{ const j=curEdit(); if(!j||!window.confirm(`¿Eliminar "${j.nombre}"?`)) return; jobs=jobs.filter(x=>x!==j); ui.edit=null; persist(); renderEditor(); };
+$('#e-restore').onclick=()=>{ const i=jobs.findIndex(x=>x.id==='sanador'); if(i>=0){ if(!window.confirm('¿Restaurar Sanador/a a los valores de ejemplo? Se pierden tus cambios en ese empleo.')) return; jobs[i]=sanador(); } else jobs.unshift(sanador()); ui.edit='sanador'; persist(); renderEditor(); toast('Sanador/a restaurado'); };
+$('#e-export').onclick=()=>{ const j=curEdit(); if(j) openDlg(`Código de "${j.nombre}"`,'Pásaselo a otros jugadores: lo cargan con "Importar empleo".',encode({tipo:'empleo',...j}),null); };
+$('#e-import').onclick=()=>openDlg('Importar empleo','Pega el código de un empleo exportado.','',txt=>{
+  const j=decode(txt); if(!j||!Array.isArray(j.reqs)) throw new Error('bad'); delete j.tipo;
+  if(jobs.find(x=>x.id===j.id)) j.id=newId(); j.checks=j.checks||[]; jobs.push(j); ui.edit=j.id; persist(); renderEditor(); toast('Empleo importado');
+},'Importar');
+
+/* ============ Diálogo ============ */
+let dlgCb=null;
+function openDlg(t,p,val,cb,okLabel){
+  $('#dlg-t').textContent=t; $('#dlg-p').textContent=p; const ta=$('#dlg-ta'); ta.value=val; ta.readOnly=!cb;
+  dlgCb=cb; const ok=$('#dlg-ok'); ok.textContent=cb?(okLabel||'Aceptar'):'Copiar';
+  $('#dlg').showModal(); if(!cb){ ta.select(); }
+}
+$('#dlg-cancel').onclick=()=>$('#dlg').close();
+$('#dlg-ok').onclick=()=>{
+  const ta=$('#dlg-ta');
+  if(!dlgCb){ copy(ta.value); return; }
+  try{ dlgCb(ta.value); $('#dlg').close(); }catch(e){ toast('Ese código no es válido'); }
+};
+
+/* ============ Inicio ============ */
+renderFicha();
+setTab(ui.tab||'empleos');
+</script>
+</body>
+</html>
